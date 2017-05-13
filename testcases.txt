@@ -20,3 +20,7 @@ python validate_approvals.py --approvers mfox alovelace --changed-files
 Approved
 python validate_approvals.py --approvers --changed-files src/com/twitter/follow/Follow.java src/com/twitter/tweet/Tweet.java src/com/twitter/user/User.java
 Insufficient Approvals
+python validate_approvals.py --approvers alovelace --changed-files src/com/twitter/user/User.java tests/com/twitter/tweet/TweetTest.java
+Insufficient Approvals
+python validate_approvals.py --approvers ghopper alovelace --changed-files src/com/twitter/user/User.java tests/com/twitter/tweet/TweetTest.java
+Approved
