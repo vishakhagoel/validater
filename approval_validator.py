@@ -26,14 +26,10 @@ def read_file(file_path):
 def build_dependency_map(root_directory):
     dependency_map = defaultdict(list)
     for root, dirs, files in os.walk(root_directory):
-        current_dir = os.path.basename(root)         # subdirs : follow, message, tweet, or user
-        dependency_file = Path(root_directory + current_dir + DEPENDENCIES)           # path of file
-        dependency_data = read_file(dependency_file) if dependency_file.exists() else None
-        if dependency_data is None:
-            continue
-        #add dependencies to the map
-        for dependency in range(len(dependency_data)):
-            dependency_map.setdefault(dependency_data[dependency], []).append(root_directory + current_dir)
+        dependency_file = Path(root + DEPENDENCIES)           # path of file
+        dependency_data = read_file(dependency_file) if dependency_file.exists() else []
+        for dependency in dependency_data:
+            dependency_map[dependency].append(root)
     return dependency_map
 
 
@@ -46,28 +42,22 @@ def check_owners(approvers, directory_path):
         return True
     owners_file = Path(str(directory_path) + OWNERS)
     owners = read_file(owners_file) if owners_file.exists() else None
-    result = False
     #if any of the approvers is an owner then return true
     if owners:
-        for owner in range(len(owners)):
-            if owners[owner] in approvers:
+        for owner in owners:
+            if owner in approvers:
                 return True
         return False
-    #if owners file doesn't exist in this directory, check parent
-    else:
-        result = check_owners(approvers, os.path.dirname(str(directory_path)))
-    return result
+    return check_owners(approvers, os.path.dirname(str(directory_path)))
 
 
 #   If any directory is dependent on the given directory, check approvers for the dependent dirs
 def check_dependencies(approvers, directory_path):
-    dependency_map = defaultdict(list)
-    dependency_map = build_dependency_map(ROOT + 'src/com/twitter/')
-    dependency_list = []
+    dependency_map = build_dependency_map(ROOT)# + 'src/com/twitter/')
     if directory_path in dependency_map:
         dependency_list = dependency_map[directory_path]
-        for dependency in range(len(dependency_list)):
-            if validate_approval(approvers, dependency_list[dependency]) == False:
+        for dependency in dependency_list:
+            if validate_approval(approvers, dependency) is False:
                 return False
     return True
 
@@ -75,11 +65,11 @@ def check_dependencies(approvers, directory_path):
 #   Returns Approved if sufficient approvals were provided
 #   Returns Not Approved otherwise
 def validate_approval(approvers, files_changed):
-    for file in range(len(files_changed)):
-        directory_path = Path(ROOT + os.path.dirname(files_changed[file]))
-        if check_owners(approvers, directory_path) == False:
+    for file in files_changed:
+        directory_path = Path(ROOT + os.path.dirname(file))
+        if check_owners(approvers, directory_path) is False:
             return NOT_APPROVED
-        if check_dependencies(approvers, directory_path) == False:
+        if check_dependencies(approvers, directory_path) is False:
             return NOT_APPROVED
     return APPROVED
 
