@@ -1,0 +1,17 @@
+Approval Validator Command Line Tool
+----------------------------------------------------
+
+Pre-requisites:
+	python-2.7 and above
+
+To run the tool
+   $python validate_approvals.py --approvers [args] --changed-files [args]   
+
+To run the testcases
+	$ ./testcases.sh testcases.txt
+
+If tool returns error due to missing library, run
+   $sudo pip install <library_name>
+
+If pip is not present, run
+   $sudo easy_install pip
